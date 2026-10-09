@@ -25,5 +25,6 @@ func (w *watchdog) Start() error {
 }
 
 func (w *watchdog) CheckHealth() error {
-
+	//TODO: ping each registered service
+	return nil
 }

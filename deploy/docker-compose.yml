@@ -1,0 +1,77 @@
+# Runs the whole Lykeion backend locally: two Postgres databases, RabbitMQ and the six Go services.
+#
+#   docker compose -f deploy/docker-compose.yml up --build
+#
+# The REST API is then available on http://localhost:8080/v1.
+# Service repositories are expected next to this one (../aegis, ../demes, ...);
+# override a location with e.g. AEGIS_DIR=/path/to/aegis.
+
+name: lykeion
+
+services:
+  postgres-lexora:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lexora
+    ports: ["10000:5432"]
+    volumes: [lexora-data:/var/lib/postgresql/data]
+    healthcheck: &pg-health
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+
+  postgres-demes:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: demes
+    ports: ["10001:5432"]
+    volumes: [demes-data:/var/lib/postgresql/data]
+    healthcheck: *pg-health
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitMQ
+      RABBITMQ_DEFAULT_PASS: rabbitMQ
+    ports: ["30000:5672", "30001:15672"]
+
+  aegis:
+    build: ${AEGIS_DIR:-../../aegis}
+    volumes: [./config/aegis.yaml:/app/config.yaml:ro]
+
+  demes:
+    build: ${DEMES_DIR:-../../demes}
+    volumes: [./config/demes.yaml:/app/config.yaml:ro]
+    depends_on:
+      postgres-demes: {condition: service_healthy}
+
+  lexora-dictionary:
+    build: ${LEXORA_DICTIONARY_DIR:-../../lexora-dictionary}
+    volumes: [./config/lexora-dictionary.yaml:/app/config.yaml:ro]
+    depends_on:
+      postgres-lexora: {condition: service_healthy}
+
+  lexora-controller:
+    build: ${LEXORA_CONTROLLER_DIR:-../../lexora-controller}
+    volumes: [./config/lexora-controller.yaml:/app/config.yaml:ro]
+    depends_on: [lexora-dictionary, rabbitmq]
+
+  kosmos:
+    build: ${KOSMOS_DIR:-..}
+    volumes: [./config/kosmos.yaml:/app/dev_config.yaml:ro]
+    depends_on: [aegis, demes, lexora-controller]
+
+  gateway:
+    build: ${GATEWAY_DIR:-../../gateway}
+    volumes: [./config/gateway.yaml:/app/dev_config.yaml:ro]
+    ports: ["8080:8080"]
+    depends_on: [kosmos]
+
+volumes:
+  lexora-data:
+  demes-data:

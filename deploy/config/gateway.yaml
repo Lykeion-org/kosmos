@@ -1,0 +1,2 @@
+REST_API_port: ":8080"
+orchestrator_grpc_target: "kosmos:44000"

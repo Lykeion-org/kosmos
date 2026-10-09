@@ -1,0 +1,8 @@
+use_cli: false
+use_grpc_server: true
+dictionary_service_port: ":46001"
+database_host: "postgres-lexora"
+database_port: 5432
+database_name: "lexora"
+database_username: "postgres"
+database_password: "postgres"
