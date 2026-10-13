@@ -5,8 +5,9 @@ Aegis (tokens), Demes (users) and Lexora (dictionary) to answer each request.
 
 ## Running the whole backend locally
 
-`deploy/docker-compose.yml` starts the three Postgres databases, RabbitMQ and all seven Go services
-(aegis, demes, lexora-dictionary, lexora-controller, paideia, kosmos, gateway). Check the service repositories
+`deploy/docker-compose.yml` starts the three Postgres databases, RabbitMQ, all seven Go services
+(aegis, demes, lexora-dictionary, lexora-controller, paideia, kosmos, gateway) and the Python text-analysis
+worker (lexora-text-analysis). Check the service repositories
 out next to this one, then run from this repository:
 
 ```bash
@@ -15,7 +16,7 @@ docker compose -f deploy/docker-compose.yml up --build
 
 The REST API is then served on http://localhost:8080/v1 (`GET /v1/ping` answers `Pong`).
 Repositories in another location can be pointed to with `AEGIS_DIR`, `DEMES_DIR`, `GATEWAY_DIR`,
-`LEXORA_CONTROLLER_DIR`, `LEXORA_DICTIONARY_DIR` and `PAIDEIA_DIR`. Container settings live in `deploy/config/`.
+`LEXORA_CONTROLLER_DIR`, `LEXORA_DICTIONARY_DIR`, `LEXORA_TEXT_ANALYSIS_DIR` and `PAIDEIA_DIR`. Container settings live in `deploy/config/`.
 
 New accounts get role 1. Editing the dictionary needs role 3, which for now is set in the database:
 
@@ -23,6 +24,10 @@ New accounts get role 1. Editing the dictionary needs role 3, which for now is s
 docker compose -f deploy/docker-compose.yml exec postgres-demes \
   psql -U postgres -d demes -c "update lykeion_users set role=3 where email_address='you@example.com'"
 ```
+
+Text analysis: an editor posts `{"text": "..."}` to `POST /v1/language/nlp/` and gets a `jobID` back. The worker
+analyses the text, and every noun, verb, adjective or adverb that is not in the dictionary yet shows up in
+`GET /v1/language/suggestions`.
 
 To run a single service outside Docker instead, start the infrastructure only
 (`docker compose -f deploy/docker-compose.yml up postgres-lexora postgres-demes postgres-paideia rabbitmq`) and use
