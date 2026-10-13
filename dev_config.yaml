@@ -1,0 +1,6 @@
+# Local development settings, used by `make run-dev` (loaded from ../dev_config.yaml)
+kosmos_server_port: ":44000"
+user_service_target: "localhost:45002"
+language_service_target: "localhost:45003"
+security_service_target: "localhost:45001"
+course_service_target: "localhost:47001"

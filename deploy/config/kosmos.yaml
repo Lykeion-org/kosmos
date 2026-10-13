@@ -1,0 +1,5 @@
+kosmos_server_port: ":44000"
+user_service_target: "demes:45002"
+language_service_target: "lexora-controller:45003"
+security_service_target: "aegis:45001"
+course_service_target: "paideia:47001"
