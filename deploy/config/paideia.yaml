@@ -1,0 +1,8 @@
+paideia_service_port: ":47001"
+dictionary_service_target: "lexora-dictionary:46001"
+database_host: "postgres-paideia"
+database_port: 5432
+database_name: "paideia"
+database_username: "postgres"
+database_password: "postgres"
+log_level: "info"
