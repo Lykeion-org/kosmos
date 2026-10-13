@@ -78,3 +78,9 @@ func (s *kosmosServer) ListAllLinkedReferents(ctx context.Context, req *lexora.L
 func (s *kosmosServer) ListAllLinkedSymbols(ctx context.Context, req *lexora.ListAllLinkedSymbolsRequest) (*lexora.ListAllLinkedSymbolsResponse, error){
 	return s.languageHandler.LanguageSvc.ListAllLinkedSymbols(ctx, req)
 }
+func (s *kosmosServer) AnalyzeTextAndAddToSuggestions(ctx context.Context, req *lexora.AnalyzeTextAndAddToSuggestionsRequest) (*lexora.AnalyzeTextAndAddToSuggestionsResponse, error){
+	return s.languageHandler.LanguageSvc.AnalyzeTextAndAddToSuggestions(ctx, req)
+}
+func (s *kosmosServer) ListAllWordSuggestion(ctx context.Context, req *lexora.ListAllWordSuggestionRequest) (*lexora.ListAllWordSuggestionResponse, error){
+	return s.languageHandler.LanguageSvc.ListAllWordSuggestion(ctx, req)
+}
